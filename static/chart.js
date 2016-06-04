@@ -1,3 +1,9 @@
+var graphApi = {} 
+
+graphApi.getData = function(query, callback) {
+  d3.xhr('/data?'+query, callback)
+};
+
 window.onload = function() {
 
   /**
@@ -120,13 +126,14 @@ window.onload = function() {
                 arcText.transition().duration(750)
                     .attr("opacity", 1)
                     .attr("transform", function () {
-                    return "rotate(" + computeTextRotation(e) + ")"
-                })
+                        return "rotate(" + computeTextRotation(e) + ")"
+                    })
                     .attr("x", function (d) {
-                    return y(d.y);
-                });
+                      return y(d.y);
+                    });
             }
         });
+
     } //});
 
     // Word wrap!
@@ -171,9 +178,6 @@ window.onload = function() {
     }
   }
 
-  function getData(callback) {
-    d3.xhr('/data', callback);
-  };
 
-  getData(draw);
+  graphApi.getData('', draw);
 }

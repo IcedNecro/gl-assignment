@@ -7,6 +7,24 @@
 	<script type="text/javascript" src='{{ url_for("static", filename="chart.js") }}'></script>
 </head>
 <body>
+	<h1>San-Francisco Police Department data</h1>
 	<div id="main"></div>
+	<label for='data-from'>From</label>
+	<select onchange='handlers.dateFrom(event)' id='date-from'>
+		<option value="1">jan</option>
+		<option value="2">feb</option>
+		<option value="3">may</option>
+		<option value="4">apr</option>
+		<option value="5">mar</option>
+	</select>
+	<label for='data-to'>To</label>
+	<select onchange='handlers.dateTo(event)' id='date-to'>
+		<option value="1">jan</option>
+		<option value="2">feb</option>
+		<option value="3">may</option>
+		<option value="4">apr</option>
+		<option value="5">mar</option>
+	</select>
+	<script type="text/javascript" src='{{ url_for("static", filename="eventListener.js") }}'></script>
 </body>
 </html>

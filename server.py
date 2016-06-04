@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, jsonify
+from flask import Flask, render_template, send_from_directory, jsonify, request
 from api import SFCrimes
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ def bower(filename):
 
 @app.route('/data')
 def data():
-	return jsonify(**SFCrimes.get_filtered_data())
+	return jsonify(**SFCrimes.get_filtered_data(**request.args))
 
 @app.route('/')
 def index():

@@ -21,24 +21,25 @@ class SFCrimes(object):
 		}
 
 		conditions = []
-		
+
 		if 'start_date' in kwargs:
-			condition.append("date>'{}'" % kwargs[start_date])
+			conditions.append("date>='%s'" % kwargs['start_date'][0])
 
 		if 'end_date' in kwargs:
-			condition.append("date<'{}'" % kwargs[end_date])
+			conditions.append("date<='%s'" % kwargs['end_date'][0])
 
 		if len(conditions) != 0 :
 			query_params['$where'] = ' and '.join(conditions)
 
-			data = requests.get(SFCrimes.__api_path, params=query_params).text
+			data = requests.get(SFCrimes.__api_path, params=query_params)
 		else :
-			data = requests.get(SFCrimes.__api_path, params=query_params).text
-		
-		data = json.loads('{"data":'+data+'}')
+			data = requests.get(SFCrimes.__api_path, params=query_params)
+		print data.url	
+
+		data = json.loads('{"data":'+data.text+'}')
 
 		result = {"name":"SanFrancisco crimes","children": SFCrimes.process_data(data['data'], query_params['$group'].split(','))}
-		 
+				 
 		return result
 
 
@@ -55,8 +56,10 @@ class SFCrimes(object):
 				prev[field] = {"total":0, "items": []}
 			
 			prev[field]['items'].append(current)
-			prev[field]['total'] += int(current['count'])
-
+			try:
+				prev[field]['total'] += int(current['count'])
+			except:
+				import ipdb;ipdb.set_trace()
 			return prev
 
 		return func
@@ -79,16 +82,17 @@ class SFCrimes(object):
 			children_data = sorted([{"name" : k, "value": v['total']} for k,v in final_data.iteritems()], lambda a,b: b['value']-a['value'])
 			
 			# takes top-4 elements
-			children = children_data[:4]
+			children = children_data[:4] if len(children_data)>4 else children_data
 			# sums up another value
-			total_rest_children_data = {"name":'Other', "value": reduce( lambda prev, current: prev+current['value'], children_data[4:], 0)}
 
 			for child in children:
 				name = child['name']
 				# retrieves children for each of the element to build a nested tree
 				child['children'] = SFCrimes.process_data(final_data[name]['items'], fields[1:])
 
-			children.append(total_rest_children_data)
+			if len(children_data)>4 :
+				total_rest_children_data = {"name":'Other', "value": reduce( lambda prev, current: prev+current['value'], children_data[4:], 0)}
+				children.append(total_rest_children_data)
 
 			return children
 
