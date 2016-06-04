@@ -1,0 +1,21 @@
+{
+  "name": "globallogic-assignment",
+  "description": "",
+  "main": "chart.js",
+  "authors": [
+    "Roman Statkevych <romanstatkevich@gmail.com>"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.17"
+  }
+}
