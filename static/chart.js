@@ -1,5 +1,6 @@
 var graphApi = {} 
 
+// code below is executed after page is loaded
 window.onload = function() {
   var oldVals = [],
       svg,
@@ -33,7 +34,8 @@ window.onload = function() {
       });
 
 
-  
+  /* Initializes svg element
+   */
   function initGraph() {
     svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -45,6 +47,19 @@ window.onload = function() {
         .value(function (d) {
             return d.value;
         });
+
+    x = d3.scale.linear()
+        .range([0, 2 * Math.PI]);
+    
+    default_x = d3.scale.linear()
+        .range([0, 2 * Math.PI]);;
+
+    y = d3.scale.sqrt()
+        .range([0, radius]);
+
+    default_y = d3.scale.sqrt()
+        .range([0, radius]);
+
   }
 
   /**
@@ -57,6 +72,7 @@ window.onload = function() {
 
       if(data.children && data.children !== []) {
         data.children.forEach(function(_child) {
+          // computes maximal depth
           _depth = Math.max(_getDepth(_child, depth+1), _depth);
         })
       }
@@ -67,6 +83,12 @@ window.onload = function() {
     return _getDepth(data, 0)
   }
 
+  /**
+   * Draws new segments on the chart 
+   *
+   * @param {object} data - data for new nodes to add to the chart
+   * @param {data} depth - maximal depth of the partition
+   */
   function draw(data, depth) {
 
     var g = svg.selectAll(".new-pie-element")
@@ -82,20 +104,6 @@ window.onload = function() {
         .style("fill", function (d) {
             return color((d.children ? d : d.parent).name);
         })
-        .on("click", changeLevel);
-
-    path.on('mousemove', function(d) {
-      tooltip.select('.label-text').text(d.name);
-      if(d.parent) {
-        tooltip.select('.value-text').text(d.value);
-      }
-      tooltip.attr('opacity',1);
-      tooltip.attr('transform', 'translate('+[d3.event.offsetX,d3.event.offsetY]+')');
-    });
-
-    path.on('mouseout', function(d) {
-      tooltip.attr('opacity',0)
-    });
 
     var text = g.append("text")
       .attr("x", function (d) {
@@ -115,39 +123,37 @@ window.onload = function() {
           return d.name;
       })
       .style("fill","white");
+    
+    // adding event handler
+    path.on("click", changeLevel);
 
-    // Word wrap!
-    var insertLinebreaks = function (t, d, width) {
-        alert(0)
-        var el = d3.select(t);
-        var p = d3.select(t.parentNode);
-        p.append("g")
-        .attr("x", function (d) {
-          return y(d.y);
-        })
-        .attr("transform", function (d) {
-          return "rotate(" + computeTextRotation(d) + ")";
-        })
-        .append("foreignObject")
-          .attr('x', -width/2)
-          .attr("width", width)
-          .attr("height", 200)
-          .append("xhtml:p")
-            .attr('style','word-wrap: break-word; text-align:center;')
-            .html(d.name);    
-        alert(1)
-        el.remove();
-        alert(2)
-    };
+    path.on('mousemove', function(d) {
+      tooltip.select('.label-text').text(d.name);
+      if(d.parent) {
+        tooltip.select('.value-text').text(d.value);
+      }
+      tooltip.attr('opacity',1);
+      tooltip.attr('transform', 'translate('+[d3.event.offsetX,d3.event.offsetY]+')');
+    });
+
+    path.on('mouseout', function(d) {
+      tooltip.attr('opacity',0)
+    });
 
     d3.select(self.frameElement).style("height", height + "px");
   }
 
+  /* 
+   * swithes a level of the chart
+   *
+   * @param {object} d - node data
+   */
   function changeLevel(d) {
-      // fade out all text elements
       if(d.value !== undefined) {
           d.value += 100;
       };
+
+      // fade out all text elements
       d3.selectAll('.pie-elem text')
         .transition()
         .attr("opacity", 0);
@@ -174,8 +180,11 @@ window.onload = function() {
               }
           });
 
-  } //});
+  } 
 
+  /**
+   * transforms the chart back to the root level
+   */
   function changeLevelWithoutTransition() {
       x = default_x; y = default_y;
 
@@ -195,6 +204,7 @@ window.onload = function() {
           return y(d.y);
         });
   }
+
   function computeTextRotation(d) {
       var angle = x(d.x + d.dx / 2) - Math.PI / 2;
       return angle / Math.PI * 180;
@@ -216,20 +226,12 @@ window.onload = function() {
       };
   }
 
+  /**
+   * Updates chart by refreshing existing data and adding new one
+   *
+   * @param {object} data - data to update the chart
+   */
   function update(data) {
-    data.root = true;
-
-    x = d3.scale.linear()
-        .range([0, 2 * Math.PI]);
-    
-    default_x = d3.scale.linear()
-        .range([0, 2 * Math.PI]);;
-
-    y = d3.scale.sqrt()
-        .range([0, radius]);
-
-    default_y = d3.scale.sqrt()
-        .range([0, radius]);
 
     var upd = [];
     var newValues = [];
@@ -245,10 +247,12 @@ window.onload = function() {
         }
 
         var nonzero = false;
+
+        // loop to find if current node is updated
         for(var i in data) {
           var b = data[i];
           if( b && b.name === a.name && b.parent.name === a.parent.name) {
-            // update value
+            // update values
             a.x = b.x;
             a.y = b.y;
             a.value = b.value;
@@ -260,19 +264,22 @@ window.onload = function() {
             break;
           }
         }
-        // if there is no updated for the node
+        // if there is no data about current node, let's consider it as 0 value
         if(!nonzero) a.value = 0;
       })
       .classed('new-pie-element', false)
     
+    // getting rid of 0-value segments 
     g.filter(function(d) { return d.value === 0 }).remove();
     
     var root = d3.select('.pie-elem');
 
+    // updating path 
     d3.selectAll('.pie-elem path')
       .transition(750)
       .attr('d',arc)
 
+    // updating text 
     d3.selectAll('.pie-elem text')
       .attr("x", function (d) {
           return y(d.y);
@@ -281,21 +288,30 @@ window.onload = function() {
           return "rotate(" + computeTextRotation(d) + ")";
       })
 
-
+    // draws new data on the chart
     draw(data.filter(function(d) {return d}), depth);
   }
 
+  /**
+   * @param {object} query - query string for http request to REST API 
+   */
   function getData(query) {
-    var rootElem = d3.select('.pie-elem path');
-    
-    if(!rootElem.empty())
-      changeLevelWithoutTransition();
 
+    // sends http request
     d3.xhr('/data?'+query, function(err, data) {
+      var rootElem = d3.select('.pie-elem path');
+      
+      // if there is no root element (first time loaded)
+      if(!rootElem.empty()) {
+        changeLevelWithoutTransition();
+      }
+      
       update(JSON.parse(data.responseText));
     });
   };
 
+  /* initializes tooltip for displaying data
+   */
   function initTooltip() {
     tooltip = d3.select('svg').append('g')
       .attr('opacity', 0)

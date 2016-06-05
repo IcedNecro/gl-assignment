@@ -18,12 +18,12 @@
 		<option value="4">mar</option>
 	</select>
 	<label for='data-to'>To</label>
-	<select onchange='handlers.dateTo(event)' id='date-to'>
+	<select onchange='handlers.dateTo(event)' value='4' id='date-to'>
 		<option value="0">jan</option>
 		<option value="1">feb</option>
 		<option value="2">may</option>
 		<option value="3">apr</option>
-		<option value="4">mar</option>
+		<option value="4" selected="selected">mar</option>
 	</select>
 	<script type="text/javascript" src='{{ url_for("static", filename="eventListener.js") }}'></script>
 </body>

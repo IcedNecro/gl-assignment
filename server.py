@@ -11,6 +11,11 @@ def bower(filename):
 
 @app.route('/data')
 def data():
+	'''
+		optional query parameters
+		 - `start_date` - datetime - get data with date grater than `start_date`
+		 - `end_date` - datetime - get data with date less than `end_date`
+	'''
 	return jsonify(**SFCrimes.get_filtered_data(**request.args))
 
 @app.route('/')

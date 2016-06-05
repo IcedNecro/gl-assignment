@@ -15,6 +15,7 @@ handlers.dateFrom = function(event) {
 	var anotherInput = document.getElementById('date-to');
 	var monthTo = anotherInput.value;
 
+	// avoiding confuse that monthTo input is less than monthFrom 
 	if(monthTo<monthFrom) {
 		monthTo = monthFrom;
 		anotherInput.value = monthTo;
