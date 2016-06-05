@@ -9,7 +9,7 @@ window.onload = function() {
       radius = Math.min(width, height) / 2,
       partition,
       depth,
-      x, y, default_x, default_y,
+      x, y,
       color = d3.scale.category10();
 
   var tooltip;
@@ -51,13 +51,7 @@ window.onload = function() {
     x = d3.scale.linear()
         .range([0, 2 * Math.PI]);
     
-    default_x = d3.scale.linear()
-        .range([0, 2 * Math.PI]);;
-
     y = d3.scale.sqrt()
-        .range([0, radius]);
-
-    default_y = d3.scale.sqrt()
         .range([0, radius]);
 
   }
@@ -186,7 +180,10 @@ window.onload = function() {
    * transforms the chart back to the root level
    */
   function changeLevelWithoutTransition() {
-      x = default_x; y = default_y;
+      x = d3.scale.linear()
+        .range([0, 2 * Math.PI]);
+      y = d3.scale.sqrt()
+        .range([0, radius]);
 
       d3.selectAll('.pie-elem path')
         .attr('opacity',0)
