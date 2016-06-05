@@ -82,7 +82,7 @@ class SFCrimes(object):
 			children_data = sorted([{"name" : k, "value": v['total']} for k,v in final_data.iteritems()], lambda a,b: b['value']-a['value'])
 			
 			# takes top-4 elements
-			children = children_data[:4] if len(children_data)>4 else children_data
+			children = children_data[:3] if len(children_data)>3 else children_data
 			# sums up another value
 
 			for child in children:
@@ -90,8 +90,8 @@ class SFCrimes(object):
 				# retrieves children for each of the element to build a nested tree
 				child['children'] = SFCrimes.process_data(final_data[name]['items'], fields[1:])
 
-			if len(children_data)>4 :
-				total_rest_children_data = {"name":'Other', "value": reduce( lambda prev, current: prev+current['value'], children_data[4:], 0)}
+			if len(children_data)>3 :
+				total_rest_children_data = {"name":'Other', "value": reduce( lambda prev, current: prev+current['value'], children_data[3:], 0)}
 				children.append(total_rest_children_data)
 
 			return children

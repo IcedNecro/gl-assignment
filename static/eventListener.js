@@ -25,9 +25,7 @@ handlers.dateFrom = function(event) {
 
 	var query = 'start_date='+dateFrom+'&end_date='+dateTo;
 
-	graphApi.getData(query, function(err,data) {
-		console.log(JSON.parse(data.response));
-	});
+	graphApi.update(query);
 }
 
 
@@ -46,7 +44,5 @@ handlers.dateTo = function(event) {
 
 	var query = 'start_date='+dateFrom+'&end_date='+dateTo;
 
-	graphApi.getData(query, function(err,data) {
-		console.log(JSON.parse(data.response));
-	});
+	graphApi.update(query);
 }
