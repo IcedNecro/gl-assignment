@@ -13,6 +13,8 @@ python 2.7, pip, bower required to install all dependencies
  2. run with virtualenv
 
     make run
+    
+ Application will run on [localhost:5000](http://localhost:5000/)
 
  3. debug mode 
 
