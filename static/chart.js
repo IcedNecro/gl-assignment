@@ -10,7 +10,8 @@ window.onload = function() {
       partition,
       depth,
       x, y,
-      color = d3.scale.category10();
+      color = d3.scale.category10(),
+      isUpdating = false;
 
   var tooltip;
 
@@ -143,6 +144,7 @@ window.onload = function() {
    * @param {object} d - node data
    */
   function changeLevel(d) {
+      if(isUpdating) return;
       if(d.value !== undefined) {
           d.value += 100;
       };
@@ -293,7 +295,11 @@ window.onload = function() {
    * @param {object} query - query string for http request to REST API 
    */
   function getData(query) {
-
+    isUpdating = true;
+    d3.selectAll('path')
+      .transition()
+      .attr('opacity', 0.25);
+    
     // sends http request
     d3.xhr('/data?'+query, function(err, data) {
       var rootElem = d3.select('.pie-elem path');
@@ -304,6 +310,7 @@ window.onload = function() {
       }
       
       update(JSON.parse(data.responseText));
+      isUpdating = false;
     });
   };
 
